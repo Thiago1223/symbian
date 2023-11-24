@@ -1,8 +1,11 @@
 package br.senai.sp.jandira.symbian.cadastro.screen
 
 import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -50,12 +53,50 @@ import br.senai.sp.jandira.symbian.R
 import br.senai.sp.jandira.symbian.cadastro.components.CustomOutlinedTextField
 import br.senai.sp.jandira.symbian.cadastro.components.DefaultButton
 import br.senai.sp.jandira.symbian.repository.UserRepository
+import coil.compose.AsyncImage
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.launch
 
 @Composable
 fun CadastroScreen(
     lifecycleScope: LifecycleCoroutineScope
 ) {
+
+    var imageUri by remember {
+        mutableStateOf<Uri?>(null)
+    }
+
+    val storageRef: StorageReference = FirebaseStorage.getInstance().reference.child("images")
+
+    val firebaseFirestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+
+    val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri ->
+        uri?.let { imageUri = it }
+    }
+
+//    val storageRef: StorageReference = FirebaseStorage.getInstance().reference.child("images")
+//
+//    val firebaseFirestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+//
+//    var imageUri by remember {
+//        mutableStateOf<Uri?>(null)
+//    }
+//
+//    var selectedMedia by remember {
+//        mutableStateOf<List<Uri>>(emptyList())
+//    }
+//
+//    val launcher = rememberLauncherForActivityResult(
+//        contract = ActivityResultContracts.GetContent()
+//    ) { uri ->
+//        uri?.let {
+//            imageUri = it
+//            selectedMedia = selectedMedia + listOf(it)
+//        }
+//    }
+
     var nameState by remember {
         mutableStateOf("")
     }
@@ -102,7 +143,7 @@ fun CadastroScreen(
         senha: String,
         imagem: String
     ) {
-        if(validateData(login, senha, imagem)){
+        if (validateData(login, senha, imagem)) {
             val userRepository = UserRepository()
             lifecycleScope.launch {
 
@@ -112,14 +153,23 @@ fun CadastroScreen(
                     Log.d(MainActivity::class.java.simpleName, "$response")
                     Log.d(MainActivity::class.java.simpleName, "Registro bem-sucedido")
 
+                    var openSignUp = Intent(context, HomeActivity::class.java)
+
+                    //start a Activity
+                    context.startActivity(openSignUp)
+
                 } else {
                     val errorBody = response.errorBody()?.string()
-                    Log.e(MainActivity::class.java.simpleName, "Erro durante o registro: $errorBody")
+                    Log.e(
+                        MainActivity::class.java.simpleName,
+                        "Erro durante o registro: $errorBody"
+                    )
                     Toast.makeText(context, "Erro durante o registro", Toast.LENGTH_SHORT).show()
                 }
             }
         } else {
-            Toast.makeText(context, "Por favor, reolhe suas caixas de texto", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Por favor, reolhe suas caixas de texto", Toast.LENGTH_SHORT)
+                .show()
         }
 
     }
@@ -135,10 +185,10 @@ fun CadastroScreen(
                 .padding(top = 40.dp, start = 15.dp, end = 15.dp, bottom = 40.dp)
                 .fillMaxSize()
         ) {
-            Column (
+            Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
-            ){
+            ) {
                 Box(
                     modifier = Modifier.size(150.dp),
                     contentAlignment = Alignment.BottomEnd
@@ -158,18 +208,11 @@ fun CadastroScreen(
                             )
                         )
                     ) {
-//                    Image(
-//                        bitmap = bitmap.value.asImageBitmap(),
-//                        contentDescription = "imagem do usuário",
-//                        //colorFilter = ColorFilter.tint(colorResource(id = R.color.pink_login)),
-//                        modifier = Modifier.fillMaxSize(),
-//                        contentScale = ContentScale.Crop
-//                    )
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_launcher_background),
+                        AsyncImage(
+                            model = imageUri,
                             contentDescription = "",
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
                         )
                     }
                     Image(
@@ -182,7 +225,7 @@ fun CadastroScreen(
                             .offset(x = 3.dp, y = 3.dp)
                             .size(40.dp)
                             .clickable {
-                                //launcherImage.launch("image/*")
+                                launcher.launch("image/*")
                             },
 
                         )
@@ -230,15 +273,57 @@ fun CadastroScreen(
             DefaultButton(
                 text = "Cadastrar",
                 onClick = {
-                    register(
-                        login = nameState,
-                        senha = passwordState,
-                        imagem = "null"
-                    )
-                    var openSignUp = Intent(context, HomeActivity::class.java)
 
-                    //start a Activity
-                    context.startActivity(openSignUp)
+//                    if (selectedMedia.isNotEmpty()) {
+//                        for (uri in selectedMedia) {
+//                            val storageRef = storageRef.child("${uri.lastPathSegment}-${System.currentTimeMillis()}.jpg")
+//                            storageRef.putFile(uri).addOnCompleteListener { task ->
+//                                if (task.isSuccessful) {
+//                                    storageRef.downloadUrl.addOnSuccessListener { downloadUri ->
+//                                        val map = hashMapOf("pic" to downloadUri.toString())
+//                                        firebaseFirestore.collection("images").add(map).addOnCompleteListener { firestoreTask ->
+//                                            if (firestoreTask.isSuccessful) {
+//                                                Toast.makeText(context, "CERTO AO TENTAR REALIZAR O UPLOAD", Toast.LENGTH_SHORT).show()
+//                                            } else {
+//                                                Toast.makeText(context, "ERRO AO TENTAR REALIZAR O UPLOAD", Toast.LENGTH_SHORT).show()
+//                                            }
+//                                        }
+//                                    }
+//                                } else {
+//                                    Toast.makeText(context, "ERRO AO TENTAR REALIZAR O UPLOAD", Toast.LENGTH_SHORT).show()
+//                                }
+//                            }
+//                        }
+//                    } else {
+//                        Toast.makeText(context, "Selecione ao menos 1 imagem para prosseguir", Toast.LENGTH_SHORT).show()
+//                    }
+
+                    imageUri?.let {
+                        val riversRef = storageRef.child("${it.lastPathSegment}-${System.currentTimeMillis()}.jpg")
+                        val uploadTask = riversRef.putFile(it)
+                        uploadTask.addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                riversRef.downloadUrl.addOnSuccessListener { uri ->
+                                    val map = HashMap<String, Any>()
+                                    map["pic"] = uri.toString()
+                                    firebaseFirestore.collection("images").add(map).addOnCompleteListener { firestoreTask ->
+                                        if (firestoreTask.isSuccessful){
+                                            Toast.makeText(context, "UPLOAD REALIZADO COM SUCESSO", Toast.LENGTH_SHORT).show()
+                                            register(
+                                                login = nameState,
+                                                senha = passwordState,
+                                                imagem = "$uri"
+                                            )
+                                        }else{
+                                            Toast.makeText(context, "ERRO AO TENTAR REALIZAR O UPLOAD", Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+                                }
+                            } else {
+                                Toast.makeText(context, "ERRO AO TENTAR REALIZAR O UPLOAD", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
                 }
             )
         }

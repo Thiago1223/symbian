@@ -1,5 +1,7 @@
 package br.senai.sp.jandira.symbian.cadastro.screen
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -40,14 +42,18 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.LifecycleCoroutineScope
+import br.senai.sp.jandira.symbian.MainActivity
 import br.senai.sp.jandira.symbian.R
 import br.senai.sp.jandira.symbian.cadastro.components.CustomOutlinedTextField
 import br.senai.sp.jandira.symbian.cadastro.components.DefaultButton
+import br.senai.sp.jandira.symbian.repository.UserRepository
+import kotlinx.coroutines.launch
 
 @Composable
-fun CadastroScreen() {
-
-
+fun CadastroScreen(
+    lifecycleScope: LifecycleCoroutineScope
+) {
     var nameState by remember {
         mutableStateOf("")
     }
@@ -75,6 +81,46 @@ fun CadastroScreen() {
     val validateNameError = "Nome não pode ficar em branco"
     val validatePasswordError =
         "Deve misturar letras maiúsculas e minúsculas, pelo menos um número, caracter especial e mínimo de 8 caracteres"
+
+    fun validateData(
+        name: String,
+        password: String,
+        imagem: String
+    ): Boolean {
+        val passwordRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#\$%^&+=!]).{8,}\$".toRegex()
+
+        validateName = name.isNotBlank()
+        validatePassword = passwordRegex.matches(password)
+
+        return validateName && validatePassword
+    }
+
+    fun register(
+        login: String,
+        senha: String,
+        imagem: String
+    ) {
+        if(validateData(login, senha, imagem)){
+            val userRepository = UserRepository()
+            lifecycleScope.launch {
+
+                val response = userRepository.registerUser(login, senha, imagem)
+
+                if (response.isSuccessful) {
+
+                    Log.d(MainActivity::class.java.simpleName, "Registro bem-sucedido")
+
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    Log.e(MainActivity::class.java.simpleName, "Erro durante o registro: $errorBody")
+                    Toast.makeText(context, "Erro durante o registro", Toast.LENGTH_SHORT).show()
+                }
+            }
+        } else {
+            Toast.makeText(context, "Por favor, reolhe suas caixas de texto", Toast.LENGTH_SHORT).show()
+        }
+
+    }
 
 
     Surface(
@@ -183,15 +229,21 @@ fun CadastroScreen() {
 
             DefaultButton(
                 text = "Cadastrar",
-                onClick = {}
+                onClick = {
+                    register(
+                        login = nameState,
+                        senha = passwordState,
+                        imagem = "null"
+                    )
+                }
             )
         }
     }
 
 }
 
-@Preview
-@Composable
-fun CadastroScreenPreview() {
-    CadastroScreen()
-}
+//@Preview
+//@Composable
+//fun CadastroScreenPreview() {
+//    CadastroScreen()
+//}

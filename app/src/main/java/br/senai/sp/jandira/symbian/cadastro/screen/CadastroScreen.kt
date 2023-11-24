@@ -1,5 +1,6 @@
 package br.senai.sp.jandira.symbian.cadastro.screen
 
+import android.content.Intent
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
@@ -43,6 +44,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LifecycleCoroutineScope
+import br.senai.sp.jandira.symbian.HomeActivity
 import br.senai.sp.jandira.symbian.MainActivity
 import br.senai.sp.jandira.symbian.R
 import br.senai.sp.jandira.symbian.cadastro.components.CustomOutlinedTextField
@@ -233,7 +235,10 @@ fun CadastroScreen(
                         senha = passwordState,
                         imagem = "null"
                     )
+                    var openSignUp = Intent(context, HomeActivity::class.java)
 
+                    //start a Activity
+                    context.startActivity(openSignUp)
                 }
             )
         }

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "6017455674",
+    "project_id": "symbian-mt",
+    "storage_bucket": "symbian-mt.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:6017455674:android:c26fb10dfe3e10ca868703",
+        "android_client_info": {
+          "package_name": "br.senai.sp.jandira.symbian"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAq_HzcE4Izd7NawIeMk7NClR8JGdW1VdE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

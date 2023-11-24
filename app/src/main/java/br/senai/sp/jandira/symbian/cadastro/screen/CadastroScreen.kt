@@ -107,7 +107,7 @@ fun CadastroScreen(
                 val response = userRepository.registerUser(login, senha, imagem)
 
                 if (response.isSuccessful) {
-
+                    Log.d(MainActivity::class.java.simpleName, "$response")
                     Log.d(MainActivity::class.java.simpleName, "Registro bem-sucedido")
 
                 } else {
@@ -225,8 +225,6 @@ fun CadastroScreen(
                     borderColor = Color.Black
                 )
             }
-
-
             DefaultButton(
                 text = "Cadastrar",
                 onClick = {
@@ -235,15 +233,9 @@ fun CadastroScreen(
                         senha = passwordState,
                         imagem = "null"
                     )
+
                 }
             )
         }
     }
-
 }
-
-//@Preview
-//@Composable
-//fun CadastroScreenPreview() {
-//    CadastroScreen()
-//}

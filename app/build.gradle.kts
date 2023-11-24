@@ -69,5 +69,11 @@ dependencies {
 
     //Mais Icones
     implementation ("androidx.compose.material:material-icons-extended:1.2.0")
+    implementation ("com.google.code.gson:gson:2.8.9")
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation ("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.1")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.0")
 
 }
